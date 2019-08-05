@@ -10,6 +10,7 @@
 #include <stdlib.h>
 //#include <iostream>
 #include <geometry_msgs/Twist.h>
+#include <string>
 
 using namespace std;
 
@@ -18,16 +19,30 @@ int kbhit();
 int getch();
 int sub_value=0;
 ros::Publisher pub2;
-ros::Subscriber sub2;
+ros::Subscriber sub2, subAngleSpeed;
 std_msgs::Int8 msg2;
 int key = 0;
 
 int spd=70;
 int angle=90;
+String angleSpeed; //string data, expected to subscribed ; "angle/speed"
 
-void msgCallback(const std_msgs::Int16::ConstPtr& given_msg) {
+//void msgCallback(const std_msgs::Int16::ConstPtr& given_msg) {
+void msgCallback(const std_msgs::String::ConstPtr& given_msg) {
 
-	sub_value = (given_msg->data);
+	//sub_value = (given_msg->data);
+	angleSpeed = (given_msg->data);
+	String str_angle, str_speed;
+	int angle = 0, speed = 0;
+
+	for(int i=0; i<angleSpeed.size(); i++) {
+		if(angleSpeed.at(i) == '/')
+			str_angle = substr(0,i-1);
+			str_speed = substr(i+1,angleSpeed.size()-1);
+	}
+	angle = atoi(str_angle);
+	speed = atoi(str_speed);
+	//sub_value를 angle로 바꿔서 쓰기??
 
 	if(0 <= abs(sub_value) && abs(sub_value) <= 20){
 		angle = 90;	
@@ -36,7 +51,7 @@ void msgCallback(const std_msgs::Int16::ConstPtr& given_msg) {
 		if(sub_value < 0) sub_value = (sub_value + 20) * 0.35;
 		else sub_value = (sub_value - 20) * 0.35;
 	}
-	else {	// 
+	else {
 		if(sub_value < 0) sub_value = (sub_value + 20) * 0.8;
 		else sub_value = (sub_value - 20) * 0.8;
 	}
